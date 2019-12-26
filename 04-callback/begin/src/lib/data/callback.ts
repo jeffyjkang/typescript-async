@@ -14,6 +14,33 @@ import { apiUrl, parseList } from './config';
  * and all of his/her related data.
  * Use callbacks for both success and error conditions.
  */
+export const getHeroTreeCallback = function(
+  email: string,
+  callback: Callback<Hero>,
+  callBackError?: CallbackError,
+) {
+  getHeroCallback(
+    email,
+    (hero: Hero) => {
+      getOrdersCallback(
+        hero.id,
+        (orders: Order[]) => {
+          hero.orders = orders;
+          getAccountRepCallback(
+            hero.id,
+            function(accountRep: AccountRepresentative) {
+              hero.accountRep = accountRep;
+              callback(hero);
+            },
+            error => callBackError(error),
+          );
+        },
+        error => callBackError(error),
+      );
+    },
+    error => callBackError(error),
+  );
+};
 
 const getHeroCallback = function(
   email: string,
